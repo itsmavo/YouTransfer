@@ -20,17 +20,33 @@ service: youtransfer-backend
 # Check out our docs for more details
 frameworkVersion: "3"
 
+plugins:
+  - serverless-iam-roles-per-function
+
 provider:
   name: aws
   runtime: nodejs18.x
   region: eu-west-1
-
-
+  environment:
+    BUCKET_NAME: !Ref NewResource
 
 
 functions:
-  hello:
-    handler: handler.hello
+  createShare:
+    handler: share-handler.handleEvent
+    events:
+      - httpApi:
+          method: POST
+          path: '/'
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - s3:PutObject
+          - s3:GetObject
+          - s3:ListBucket
+        Resource: 
+          - !Sub "arn:aws:s3:::${NewResource}/shares/*"
+          - !Sub "arn:aws:s3:::${NewResource}"
 
 resources:
   Resources:
