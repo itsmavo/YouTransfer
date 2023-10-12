@@ -1,23 +1,7 @@
-# Welcome to Serverless!
-#
-# This file is the main config file for your service.
-# It's very minimal at this point and uses default values.
-# You can always add more config options for more control.
-# We've included some commented out config examples here.
-# Just uncomment any of them to get that config option.
-#
-# For full config options, check the docs:
-#    docs.serverless.com
-#
-# Happy Coding!
+
 
 service: youtransfer-backend
-# app and org for use with dashboard.serverless.com
-#app: your-app-name
-#org: your-org-name
 
-# You can pin your service to only deploy with a specific Serverless version
-# Check out our docs for more details
 frameworkVersion: "3"
 
 plugins:
@@ -29,6 +13,10 @@ provider:
   region: eu-west-1
   environment:
     BUCKET_NAME: !Ref NewResource
+    BASE_URL: https://${self:custom.domainName}
+
+custom:
+  domainName: you-tr.click
 
 
 functions:
@@ -37,7 +25,7 @@ functions:
     events:
       - httpApi:
           method: POST
-          path: '/'
+          path: "/"
     iamRoleStatements:
       - Effect: Allow
         Action:
@@ -50,6 +38,38 @@ functions:
 
 resources:
   Resources:
+    CustomDomain:
+      Type: AWS::ApiGatewayV2::DomainName
+      Properties:
+        DomainName: ${self:custom.domainName}
+        DomainNameConfigurations:
+          - CertificateArn: ${cf:domain-${sls:stage}.DomainCertArn}
+            EndpointType: REGIONAL
+    
+    DomainRecordSet:
+      Type: AWS::Route53::RecordSetGroup
+      Properties:
+        HostedZoneId: ${cf:domain-${sls:stage}.PublicHostedZone}
+        RecordSets:
+          - Name: ${self:custom.domainName}
+            Type: A
+            AliasTarget:
+              DNSName: !GetAtt CustomDomain.RegionalDomainName
+              HostedZoneId: !GetAtt CustomDomain.RegionalHostedZoneId
+          - Name: ${self:custom.domainName}
+            Type: AAAA
+            AliasTarget:
+              DNSName: !GetAtt CustomDomain.RegionalDomainName
+              HostedZoneId: !GetAtt CustomDomain.RegionalHostedZoneId
+
+    CustomDomainPathMapping:
+      Type: AWS::ApiGatewayV2::ApiMapping
+      Properties:
+        ApiId: !Ref HttpApi
+        ApiMappingKey: 'share'
+        DomainName: !Ref CustomDomain
+        Stage: !Ref HttpApiStage
+            
     NewResource:
       Type: 'AWS::S3::Bucket'
       DeletionPolicy: Retain
