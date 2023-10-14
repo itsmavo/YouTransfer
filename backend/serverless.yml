@@ -30,8 +30,21 @@ functions:
       - Effect: Allow
         Action:
           - s3:PutObject
-          - s3:GetObject
           - s3:ListBucket
+        Resource: 
+          - !Sub "arn:aws:s3:::${NewResource}/shares/*"
+          - !Sub "arn:aws:s3:::${NewResource}"
+
+  download:
+    handler: download.handleEvent
+    events:
+      - httpApi:
+          method: GET
+          path: "/{id}"
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - s3:GetObject
         Resource: 
           - !Sub "arn:aws:s3:::${NewResource}/shares/*"
           - !Sub "arn:aws:s3:::${NewResource}"
