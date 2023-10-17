@@ -12,5 +12,14 @@
   "license": "ISC",
   "devDependencies": {
     "serverless-iam-roles-per-function": "^3.2.0"
+  },
+  "dependencies": {
+    "@aws-lambda-powertools/logger": "^1.14.0",
+    "@aws-lambda-powertools/metrics": "^1.14.0",
+    "@aws-lambda-powertools/tracer": "^1.14.0",
+    "@aws-sdk/s3-request-presigner": "^3.429.0",
+    "@middy/core": "^4.6.5",
+    "@middy/http-content-negotiation": "^4.6.5",
+    "@middy/http-header-normalizer": "^4.6.5"
   }
 }
