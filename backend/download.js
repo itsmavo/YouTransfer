@@ -24,7 +24,7 @@ async function handler (event, context)  {
     const downloadUrl = await getSignedUrl(s3Client, getCommand, {
         expiresIn: EXPIRY_DEFAULT,
     });
-    logger.info('Downloading Share', { id, key });
+    logger.info('Downloading Share', { id , key });
     metrics.addMetric('downloadShare', MetricUnits.Count, 1);
     // return the HTTP redirect response to the presigned URL
     return {
@@ -36,6 +36,6 @@ async function handler (event, context)  {
 }
 
 export const handleEvent = middy(handler)
-    .use(injectLambdaContext({ logger, logEvents: true }))
+    .use(injectLambdaContext( logger, { logEvents: true }))
     .use(logMetrics(metrics))
     .use(captureLambdaHandler(tracer));
