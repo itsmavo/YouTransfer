@@ -21,6 +21,7 @@
     "@aws-sdk/s3-request-presigner": "^3.430.0",
     "@middy/core": "^4.6.5",
     "@middy/http-content-negotiation": "^4.6.5",
-    "@middy/http-header-normalizer": "^4.6.5"
+    "@middy/http-header-normalizer": "^4.6.5",
+    "sanitize-filename": "^1.6.3"
   }
 }

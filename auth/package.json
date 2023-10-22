@@ -1,0 +1,27 @@
+{
+  "name": "auth",
+  "version": "1.0.0",
+  "description": "Auth service for monorepo",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Marvin Osolo",
+  "license": "MIT",
+  "devDependencies": {
+    "@middy/http-response-serializer": "^4.6.5",
+    "serverless-iam-roles-per-function": "^3.2.0"
+  },
+  "dependencies": {
+    "@aws-lambda-powertools/logger": "^1.14.0",
+    "@aws-lambda-powertools/metrics": "^1.14.0",
+    "@aws-lambda-powertools/tracer": "^1.14.0",
+    "@aws-sdk/client-dynamodb": "^3.433.0",
+    "@aws-sdk/lib-dynamodb": "^3.433.0",
+    "@middy/core": "^4.6.5",
+    "@middy/http-header-normalizer": "^4.6.5",
+    "@middy/http-urlencode-body-parser": "^4.6.5",
+    "crypto-random-string": "^5.0.0",
+    "undici": "^5.26.4"
+  }
+}
