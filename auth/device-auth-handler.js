@@ -5,9 +5,21 @@ import middy from "@middy/core";
 
 import cryptoRandomString from 'crypto-random-string';
 
+import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
+import { DynamoDBDocument } from "@aws-sdk/lib-dynamodb";
+
+import { CODE_EXPIRY_SECONDS, 
+        TOKEN_REQUEST_INTERVAL_SECONDS, 
+        TABLE_NAME, 
+        VERIFICATION_URI} from './config.js'
+import { DeviceAuthStatus } from './constants.js'
+
 const tracer = new Tracer();
 const logger = new Logger();
 const metrics = new Metrics();
+
+const ddbClient = new DynamoDBClient();
+const docClient = DynamoDBDocument.from(ddbClient);
 
 async function handler (event) {
     // create a device code (high entropy)
@@ -17,22 +29,50 @@ async function handler (event) {
     const userCode = cryptoRandomString({length: 8, type: 'distinguishable'});
 
     // Create an entry in the table
+    // Store: device_code, user_code, expiration, state
+    const expiration = (Date.now() / 1000) + CODE_EXPIRY_SECONDS;
+
+    const deviceKey = `device_code#${deviceCode}`;
+    const userCodeKey = `user_code#${userCode}`;
+
+    const putItemInput = {
+        TableName: TABLE_NAME,
+        Item: {
+            pk: deviceKey,
+            sk: deviceKey,
+            gsi1pk: userCodeKey,
+            gsi1sk: userCodeKey,
+            s: DeviceAuthStatus.PENDING,
+            expiration
+        }
+    };
+
+    logger.debug({putItemInput});
+    const ddbResponse = await docClient.put(putItemInput);
+    logger.debug({ddbResponse});
 
     // Create some metrics
+    metrics.addMetric('DeviceAuthRequestCount', MetricUnits.Count, 1);
 
     // Construct the RFC 8628 device auth response
-    /**
-     * {
-     * device_code:,
-     * user_code:,
-     * verification_uri:,
-     * verification_uri_complete:,
-     * expires_in:,
-     * interval:,
-     * }
-     */
+    const deviceAuthResponsePayload = {
+        device_code: deviceCode,
+        user_code: userCode,
+        verification_uri: VERIFICATION_URI,
+        verification_uri_complete: `${VERIFICATION_URI}?user_code=${userCode}`,
+        expires_in: CODE_EXPIRY_SECONDS,
+        interval: TOKEN_REQUEST_INTERVAL_SECONDS,
+    };
+   
 
     // Return the response
+    return{
+        statusCode: 200,
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(deviceAuthResponsePayload)
+    }
 }
 
 export const handleEvent = middy(handler)
