@@ -35,7 +35,7 @@ functions:
     iamRoleStatements:
       - Effect: Allow
         Action:
-          - dynamo:PutItem
+          - dynamodb:PutItem
         Resource: 
           - !GetAtt Table.Arn
 
@@ -48,8 +48,8 @@ functions:
     iamRoleStatements:
       - Effect: Allow
         Action:
-          - dynamo:UpdateItem
-          - dynamo:Query
+          - dynamodb:UpdateItem
+          - dynamodb:Query
         Resource: 
           - !GetAtt Table.Arn
           - !Sub "${Table.Arn}/*"
@@ -63,8 +63,8 @@ functions:
     iamRoleStatements:
       - Effect: Allow
         Action:
-          - dynamo:UpdateItem
-          - dynamo:Query
+          - dynamodb:UpdateItem
+          - dynamodb:Query
         Resource: 
           - !GetAtt Table.Arn
           - !Sub "${Table.Arn}/*"
@@ -78,7 +78,7 @@ functions:
     iamRoleStatements:
       - Effect: Allow
         Action:
-          - dynamo:GetItem
+          - dynamodb:GetItem
         Resource: 
           - !GetAtt Table.Arn
 

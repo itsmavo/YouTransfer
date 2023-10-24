@@ -16,6 +16,10 @@
   "license": "ISC",
   "dependencies": {
     "commander": "^11.1.0",
+    "conf": "^11.0.2",
+    "enquirer": "^2.4.1",
+    "open": "^9.1.0",
+    "ora": "^7.0.1",
     "undici": "^5.26.3"
   }
 }
