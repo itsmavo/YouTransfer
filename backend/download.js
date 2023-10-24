@@ -25,7 +25,7 @@ async function handler (event, context)  {
         expiresIn: EXPIRY_DEFAULT,
     });
     logger.info('Downloading Share', { id , key });
-    metrics.addMetric('downloadShare', MetricUnits.Count, 1);
+    metrics.addMetric('downloadShareCount', MetricUnits.Count, 1);
     // return the HTTP redirect response to the presigned URL
     return {
         statusCode: 301,
@@ -36,6 +36,6 @@ async function handler (event, context)  {
 }
 
 export const handleEvent = middy(handler)
-    .use(injectLambdaContext( logger, { logEvents: true }))
+    .use(injectLambdaContext( logger, { logEvent: true }))
     .use(logMetrics(metrics))
     .use(captureLambdaHandler(tracer));

@@ -29,7 +29,7 @@ async function handler (event, context) {
   const contentDispositionHeader = contentDisposition && `content-disposition: ${contentDisposition}`;
 
   logger.info('Creating a new share', { id, key, filename, contentDispositionHeader })
-  metrics.addMetric('createShare', MetricUnits.Count, 1);
+  metrics.addMetric('createShareCount', MetricUnits.Count, 1);
 
   
   // Create and Return the Download URL

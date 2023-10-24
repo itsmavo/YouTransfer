@@ -25,6 +25,16 @@ provider:
     POWERTOOLS_SERVICE_NAME: youtransfer
     POWERTOOLS_METRICS_NAMESPACE: youtransfer
 
+  httpApi:
+    authorizers:
+      jwtAuthorizer:
+        identitySource: $request.header.Authorization
+        issuerUrl: !Sub 'https://cognito-idp.${AWS::Region}.amazonaws.com/${UserPoolIdParameter}'
+        audience:
+          - !Ref UserPoolClientIdParameter
+        type: jwt
+
+
 custom:
   domainName: you-tr.click
 
@@ -32,12 +42,12 @@ custom:
 functions:
   createShare:
     handler: share-handler.handleEvent
-   # layers:
-      #- arn:aws:lambda:eu-west-1:866106556723:layer:Node-Configjs_backend:1
     events:
       - httpApi:
           method: POST
           path: "/"
+          authorizer: 
+            name: jwtAuthorizer
     iamRoleStatements:
       - Effect: Allow
         Action:
@@ -63,6 +73,15 @@ functions:
           - !Sub "arn:aws:s3:::${NewResource}"
 
 resources:
+  Parameters:
+    UserPoolClientIdParameter:
+      Type: AWS::SSM::Parameter::Value<String>
+      Default: /youtransfer/${sls:stage}/userPoolClientId
+    UserPoolIdParameter:
+      Type: AWS::SSM::Parameter::Value<String>
+      Default: /youtransfer/${sls:stage}/userPoolId
+    
+
   Resources:
     CustomDomainPathMapping:
       Type: AWS::ApiGatewayV2::ApiMapping

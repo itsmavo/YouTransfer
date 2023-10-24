@@ -39,6 +39,48 @@ functions:
         Resource: 
           - !GetAtt Table.Arn
 
+  verifyDeviceAuthorizationRequest:
+    handler: code-verification-handler.handleEvent
+    events:
+      - httpApi:
+          method: GET
+          path: "/verify"
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamo:UpdateItem
+          - dynamo:Query
+        Resource: 
+          - !GetAtt Table.Arn
+          - !Sub "${Table.Arn}/*"
+
+  processIdpCallback:
+    handler: idp-callback-handler.handleEvent
+    events:
+      - httpApi:
+          method: GET
+          path: "/callback"
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamo:UpdateItem
+          - dynamo:Query
+        Resource: 
+          - !GetAtt Table.Arn
+          - !Sub "${Table.Arn}/*"
+
+  retrieveToken:
+    handler: token-handler.handleEvent
+    events:
+      - httpApi:
+          method: POST
+          path: "/token"
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamo:GetItem
+        Resource: 
+          - !GetAtt Table.Arn
 
 resources:
   Resources:
@@ -97,6 +139,13 @@ resources:
           - code
         AllowedOAuthScopes:
         - openid
+        UserPoolId: !Ref UserPool
+    
+    UserPoolUICustomization:
+      Type: AWS::Cognito::UserPoolUICustomizationAttachment
+      Properties:
+        ClientId: !Ref UserPoolClient
+        CSS: ${file(./user-pool-css.cjs)}
         UserPoolId: !Ref UserPool
 
     UserPoolDomain:
