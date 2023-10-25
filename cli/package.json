@@ -12,8 +12,8 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "Marvin Osolo",
+  "license": "MIT",
   "dependencies": {
     "commander": "^11.1.0",
     "conf": "^11.0.2",
